@@ -1,8 +1,9 @@
 package com.jacolp;
 
-
 import com.jacolp.config.AnnotationConfigApplicationContext;
+import com.jacolp.config.ComponentScan;
 
+@ComponentScan("com.jacolp")
 public class AppConfig {
     public static void main( String[] args ) {
         // 注入配置类并启动容器

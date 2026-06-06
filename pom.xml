@@ -11,6 +11,7 @@
   <url>http://maven.apache.org</url>
   <modules>
     <module>mini-spring-core</module>
+    <module>test-app</module>
   </modules>
 
   <properties>
