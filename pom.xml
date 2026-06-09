@@ -28,4 +28,8 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <directory>${maven.multiModuleProjectDirectory}/target/${project.artifactId}</directory>
+  </build>
 </project>
