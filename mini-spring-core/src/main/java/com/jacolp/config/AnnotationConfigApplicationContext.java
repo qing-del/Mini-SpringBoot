@@ -3,6 +3,8 @@ package com.jacolp.config;
 import com.jacolp.beans.BeanDefinition;
 import com.jacolp.beans.BeanFactory;
 import com.jacolp.beans.Component;
+import com.jacolp.beans.Scope;
+import com.jacolp.constant.BeanScopeConstant;
 import com.jacolp.exception.BaseBeanException;
 import com.jacolp.exception.NotFoundScanAnnotationException;
 
@@ -16,6 +18,8 @@ public class AnnotationConfigApplicationContext {
 
     // BeanDefinition 列表
     private ConcurrentHashMap<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>();
+    // 单例 Bean 的缓存
+    private ConcurrentHashMap<String, Object> singletonBeanMap = new ConcurrentHashMap<>();
 
     /**
      * 启动容器
@@ -82,10 +86,24 @@ public class AnnotationConfigApplicationContext {
             return; // 不是 Bean 组件
         }
 
+
         String beanName = beanClass.getSimpleName();    // 获取 Bean 名称
         beanName = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
 
         BeanDefinition beanDefinition = new BeanDefinition();
+
+        // 设置 BeanDefinition 的 Scope 类型
+        if (beanClass.isAnnotationPresent(Scope.class)) {
+            Scope scopeAnnotation = (Scope) beanClass.getAnnotation(Scope.class);
+            if (scopeAnnotation.value().equals(BeanScopeConstant.PROTOTYPE)) {
+                beanDefinition.setScope(BeanScopeConstant.PROTOTYPE);
+            } else {
+                beanDefinition.setScope(BeanScopeConstant.SINGLETON);
+            }
+        } else {
+            beanDefinition.setScope(BeanScopeConstant.SINGLETON);   // 默认单例
+        }
+
         beanDefinition.setBeanClass(beanClass); // 设置 BeanDefinition 的 Bean 类
         registerBeanDefinition(beanName, beanDefinition);   // 注册 BeanDefinition
     }
@@ -128,12 +146,23 @@ public class AnnotationConfigApplicationContext {
      * @return
      */
     public Object getBean(String beanName) {
+        // 获取 BeanDefinition
         BeanDefinition beanDefinition = beanDefinitionMap.get(beanName);
         if (beanDefinition == null) {
             throw new BaseBeanException("BeanDefinition not found!");
         }
 
-        Object bean = BeanFactory.createBean(beanDefinition.getBeanClass());
+        Object bean;
+        // 检查是不是单例 Bean
+        if (beanDefinition.getScope().equals(BeanScopeConstant.SINGLETON)) {
+            if (!singletonBeanMap.containsKey(beanName)) {
+                bean = BeanFactory.createBean(beanDefinition.getBeanClass());   // 创建单例 Bean
+                singletonBeanMap.putIfAbsent(beanName, bean);   // 缓存单例 Bean
+            }
+            bean = singletonBeanMap.get(beanName);  // 获取单例 Bean
+        } else {
+            bean = BeanFactory.createBean(beanDefinition.getBeanClass());   // 原型 Bean
+        }
 
         return bean;
     }

@@ -12,6 +12,13 @@ public class AppConfig {
 
         // 获取 Bean
         UserService userService = (UserService) context.getBean("userService");
+
+        System.out.println(userService);
+
+        System.out.println(context.getBean("userService"));
+        System.out.println(context.getBean("userService"));
+        System.out.println(context.getBean("userService"));
+
         userService.test();
     }
 }
