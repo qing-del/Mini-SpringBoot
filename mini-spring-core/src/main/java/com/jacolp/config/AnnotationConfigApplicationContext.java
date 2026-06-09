@@ -1,6 +1,7 @@
 package com.jacolp.config;
 
 import com.jacolp.beans.BeanDefinition;
+import com.jacolp.beans.BeanFactory;
 import com.jacolp.beans.Component;
 import com.jacolp.exception.BaseBeanException;
 import com.jacolp.exception.NotFoundScanAnnotationException;
@@ -82,6 +83,7 @@ public class AnnotationConfigApplicationContext {
         }
 
         String beanName = beanClass.getSimpleName();    // 获取 Bean 名称
+        beanName = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
 
         BeanDefinition beanDefinition = new BeanDefinition();
         beanDefinition.setBeanClass(beanClass); // 设置 BeanDefinition 的 Bean 类
@@ -120,4 +122,19 @@ public class AnnotationConfigApplicationContext {
         beanDefinitionMap.putIfAbsent(beanName, beanDefinition);
     }
 
+    /**
+     * 获取 Bean
+     * @param beanName
+     * @return
+     */
+    public Object getBean(String beanName) {
+        BeanDefinition beanDefinition = beanDefinitionMap.get(beanName);
+        if (beanDefinition == null) {
+            throw new BaseBeanException("BeanDefinition not found!");
+        }
+
+        Object bean = BeanFactory.createBean(beanDefinition.getBeanClass());
+
+        return bean;
+    }
 }
