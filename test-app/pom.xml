@@ -26,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>com.jacolp</groupId>
-            <artifactId>Mini-SpringBoot</artifactId>
+            <artifactId>mini-spring-core</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
