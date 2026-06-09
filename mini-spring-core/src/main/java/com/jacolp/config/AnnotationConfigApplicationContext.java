@@ -43,6 +43,7 @@ public class AnnotationConfigApplicationContext {
 
         // 获取需要扫描的包路径
         String packagePath = path.replace(".", File.separator);
+        StringBuilder packageName = new StringBuilder(packagePath);
 
         ClassLoader classLoader = AnnotationConfigApplicationContext.class.getClassLoader();
         URL resource = classLoader.getResource("");
@@ -62,7 +63,7 @@ public class AnnotationConfigApplicationContext {
             return;
         }
 
-        scanDirectory(scanDirectory);   // 扫描目录
+        scanDirectory(scanDirectory, packageName);   // 扫描目录
     }
 
     /**
@@ -91,17 +92,17 @@ public class AnnotationConfigApplicationContext {
      * 递归扫描扫描目录
      * @param directory 必须是一个目录
      */
-    private void scanDirectory(File directory) {
+    private void scanDirectory(File directory, StringBuilder packagePath) {
         File[] files = directory.listFiles();
         for (File file : files) {
             if (file.isDirectory()) {
-                scanDirectory(file);    // 如果是文件夹就需要递归
+                scanDirectory(file, packagePath.append(".").append(file.getName()));    // 如果是文件夹就需要递归
             } else {
                 String fileName = file.getName();
                 if (!fileName.endsWith(".class")) continue; // 不是类文件就跳过
 
                 // 将其加入到 BeanDefinition 列表中
-                tryAddBeanDefinition(file);
+                tryAddBeanDefinition(file, packagePath.toString());
             }
         }
     }
@@ -109,9 +110,10 @@ public class AnnotationConfigApplicationContext {
     /**
      * 添加 BeanDefinition 到待列表中
      * @param file
+     * @param packagePath 例如：传入 "com.jacolp"
      */
-    private void tryAddBeanDefinition(File file) {
-        Class beanClass = getBeanClassByFile(file); // 获取类文件所对应的类
+    private void tryAddBeanDefinition(File file, String packagePath) {
+        Class beanClass = getBeanClassByFile(file, packagePath); // 获取类文件所对应的类
 
         if (!beanClass.isAnnotationPresent(Component.class)) {
             return; // 不是 Bean 组件
@@ -142,12 +144,13 @@ public class AnnotationConfigApplicationContext {
     /**
      * 获取类文件所对应的类
      * @param file
+     * @param packagePath 例如“com.jacolp”
      * @return
      */
-    private Class getBeanClassByFile(File file) {
-        String absolutePath = file.getAbsolutePath();   // 获取绝对路径
+    private Class getBeanClassByFile(File file, String packagePath) {
+        String fileName = file.getName();
         // 获取全类名
-        String className = absolutePath.substring(absolutePath.indexOf("classes") + 8, absolutePath.indexOf(".class"));
+        String className = packagePath + "." + fileName.substring(0, fileName.indexOf(".class"));
         Class beanClass = null;
         try {
             beanClass = Class.forName(className.replace(File.separator, "."));
