@@ -36,6 +36,11 @@ public class AnnotationConfigApplicationContext {
 
         // 获取扫描路径
         String path = componentScanAnnotation.value();
+
+        if (path.equals("")) {
+            path = configClass.getPackage().getName();
+        }
+
         // 获取需要扫描的包路径
         String packagePath = path.replace(".", File.separator);
 
@@ -46,14 +51,40 @@ public class AnnotationConfigApplicationContext {
         }
 
         // 找到需要扫描的类路径
-        File directory = new File(resource.getFile());
-        if (!directory.exists() || !directory.isDirectory()) {
+        File resourceDirectory = new File(resource.getFile());
+        if (!resourceDirectory.exists() || !resourceDirectory.isDirectory()) {
             return;
         }
 
-        scanDirectory(directory);   // 扫描目录
+        // 获取最终扫描路径
+        File scanDirectory = getFinalScanDirectory(resourceDirectory, packagePath);
+        if (scanDirectory == null) {
+            return;
+        }
 
-        System.out.println(beanDefinitionMap);
+        scanDirectory(scanDirectory);   // 扫描目录
+    }
+
+    /**
+     * 获取最终扫描目录
+     * @param resourceDirectory
+     * @return
+     */
+    private File getFinalScanDirectory(File resourceDirectory, String packagePath) {
+        File[] files = resourceDirectory.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                if (file.getPath().endsWith(packagePath)) {
+                    return file;
+                }
+                // 递归搜索最终扫描路径
+                File finalScanDirectory = getFinalScanDirectory(file, packagePath);
+                if (finalScanDirectory != null) {
+                    return finalScanDirectory;
+                }
+            }
+        }
+        return null;
     }
 
     /**

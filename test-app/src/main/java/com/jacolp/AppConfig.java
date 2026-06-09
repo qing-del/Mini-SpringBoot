@@ -4,7 +4,7 @@ import com.jacolp.component.UserService;
 import com.jacolp.config.AnnotationConfigApplicationContext;
 import com.jacolp.config.ComponentScan;
 
-@ComponentScan("target")
+@ComponentScan("com.jacolp")
 public class AppConfig {
     public static void main( String[] args ) {
         // 注入配置类并启动容器
