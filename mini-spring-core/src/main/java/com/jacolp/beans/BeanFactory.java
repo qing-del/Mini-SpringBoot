@@ -17,6 +17,11 @@ public class BeanFactory {
             }
         }
 
+        if (usedConstructor == null) {
+            // TODO 暂时仅仅支持无参构造器
+            throw new BaseBeanException("No public constructor without parameters!");
+        }
+
         // 创建对象并返回
         try {
             return usedConstructor.newInstance();
