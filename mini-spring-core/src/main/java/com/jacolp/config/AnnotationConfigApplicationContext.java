@@ -6,6 +6,7 @@ import com.jacolp.beans.Component;
 import com.jacolp.beans.Scope;
 import com.jacolp.constant.BeanScopeConstant;
 import com.jacolp.exception.BaseBeanException;
+import com.jacolp.exception.DuplicateBeanDefinitionException;
 import com.jacolp.exception.NotFoundScanAnnotationException;
 
 import java.io.File;
@@ -170,11 +171,18 @@ public class AnnotationConfigApplicationContext {
 
     /**
      * 注册 BeanDefinition 到 BeanDefinition 列表中
-     * @param beanName
-     * @param beanDefinition
+     * @param beanName Bean 名称
+     * @param beanDefinition BeanDefinition
+     * @throws DuplicateBeanDefinitionException 当添加的 BeanDefinition 与已存在的 BeanDefinition 名称相同时抛出
      */
     private void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) {
-        beanDefinitionMap.putIfAbsent(beanName, beanDefinition);
+        BeanDefinition existedBeanDefinition = beanDefinitionMap.putIfAbsent(beanName, beanDefinition);
+
+        // 如果已经存在
+        if (existedBeanDefinition != null) {
+            // TODO 可以给出具体是哪两个文件冲突
+            throw new DuplicateBeanDefinitionException("Duplicate bean definition!" + beanName);
+        }
     }
 
     /**
