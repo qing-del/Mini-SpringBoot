@@ -119,8 +119,11 @@ public class AnnotationConfigApplicationContext {
             return; // 不是 Bean 组件
         }
 
+        // 获取 Component 中定义的 Bean 名称
+        Component componentAnnotation = (Component) beanClass.getAnnotation(Component.class);
+        String beanName = componentAnnotation.value();
 
-        String beanName = beanClass.getSimpleName();    // 获取 Bean 名称
+        beanName = beanName.isEmpty() ? beanClass.getSimpleName() : beanName;    // 获取 Bean 名称
         beanName = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
 
         BeanDefinition beanDefinition = new BeanDefinition();
