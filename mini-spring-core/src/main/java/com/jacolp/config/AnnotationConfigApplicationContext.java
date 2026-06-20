@@ -65,6 +65,21 @@ public class AnnotationConfigApplicationContext {
         }
 
         scanDirectory(scanDirectory, packageName);   // 扫描目录
+
+        preInstantiateSingletons(); // 提前实例化单例 Bean
+    }
+
+    /**
+     * 提前实例化单例 Bean
+     */
+    private void preInstantiateSingletons() {
+        // 遍历 BeanDefinition 列表
+        beanDefinitionMap.forEach((beanName, beanDefinition) -> {
+            if (beanDefinition.getScope().equals(BeanScopeConstant.SINGLETON)) {    // 如果是单例 Bean
+                Object bean = BeanFactory.createBean(beanDefinition.getBeanClass());
+                singletonBeanMap.put(beanName, bean);
+            }
+        });
     }
 
     /**
