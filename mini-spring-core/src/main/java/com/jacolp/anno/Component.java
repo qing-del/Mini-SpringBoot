@@ -1,4 +1,4 @@
-package com.jacolp.beans;
+package com.jacolp.anno;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

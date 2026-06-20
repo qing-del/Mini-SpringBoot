@@ -2,8 +2,8 @@ package com.jacolp;
 
 import com.jacolp.component.HelloService;
 import com.jacolp.component.UserService;
-import com.jacolp.config.AnnotationConfigApplicationContext;
-import com.jacolp.config.ComponentScan;
+import com.jacolp.context.AnnotationConfigApplicationContext;
+import com.jacolp.anno.ComponentScan;
 
 @ComponentScan("com.jacolp")
 public class AppConfig {

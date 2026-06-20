@@ -1,9 +1,10 @@
-package com.jacolp.config;
+package com.jacolp.context;
 
+import com.jacolp.anno.ComponentScan;
 import com.jacolp.beans.BeanDefinition;
 import com.jacolp.beans.BeanFactory;
-import com.jacolp.beans.Component;
-import com.jacolp.beans.Scope;
+import com.jacolp.anno.Component;
+import com.jacolp.anno.Scope;
 import com.jacolp.constant.BeanScopeConstant;
 import com.jacolp.exception.BaseBeanException;
 import com.jacolp.exception.DuplicateBeanDefinitionException;

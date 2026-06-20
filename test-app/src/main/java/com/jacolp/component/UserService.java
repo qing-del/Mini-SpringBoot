@@ -1,6 +1,6 @@
 package com.jacolp.component;
 
-import com.jacolp.beans.Component;
+import com.jacolp.anno.Component;
 
 @Component
 public class UserService {
