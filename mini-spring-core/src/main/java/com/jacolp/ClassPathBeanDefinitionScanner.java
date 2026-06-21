@@ -94,12 +94,20 @@ public class ClassPathBeanDefinitionScanner {
         }
 
         // 获取 Component 中定义的 Bean 名称
-        Component componentAnnotation = (Component) beanClass.getAnnotation(Component.class);
-        String beanName = componentAnnotation.value();
+        String beanName = resolveBeanName(beanClass);
 
-        beanName = beanName.isEmpty() ? beanClass.getSimpleName() : beanName;    // 获取 Bean 名称
-        beanName = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
+        // 解析并创建出 BeanDefinition
+        BeanDefinition beanDefinition = resolveBeanDefinition(beanClass);
 
+        registerBeanDefinition(beanName, beanDefinition);   // 注册 BeanDefinition
+    }
+
+    /**
+     * 解析并创建 BeanDefinition
+     * @param beanClass
+     * @return
+     */
+    private static BeanDefinition resolveBeanDefinition(Class beanClass) {
         BeanDefinition beanDefinition = new BeanDefinition();
 
         // 设置 BeanDefinition 的 Scope 类型
@@ -115,7 +123,23 @@ public class ClassPathBeanDefinitionScanner {
         }
 
         beanDefinition.setBeanClass(beanClass); // 设置 BeanDefinition 的 Bean 类
-        registerBeanDefinition(beanName, beanDefinition);   // 注册 BeanDefinition
+        return beanDefinition;
+    }
+
+    /**
+     * 获取 Bean 的名称
+     * @param beanClass Bean 类
+     * @return Bean 名称
+     */
+    private static String resolveBeanName(Class beanClass) {
+        // 获取 Component 注解
+        Component componentAnnotation = (Component) beanClass.getAnnotation(Component.class);
+        String beanName = componentAnnotation.value();
+
+        // 如果 Bean 名称没有指定，则默认使用类名
+        beanName = beanName.isEmpty() ? beanClass.getSimpleName() : beanName;    // 获取 Bean 名称
+        beanName = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
+        return beanName;
     }
 
     /**
